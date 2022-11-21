@@ -19,7 +19,7 @@ export const SVGErrorImage = ({src, alt, onDataError, ...props}: SVGImageProps) 
 );
 
 export const SVGImage = memo((props: SVGImageProps) => {
-    let svgImageId = useRef(`svg-${Math.random().toString(36).slice(2)}`);
+    let svgImageId = useRef(props.id ?? `svg-${Math.random().toString(36).slice(2)}`);
 
     let {src, alt, nonce, onDataError, ...svgProps} = props;
     let [, type, base64, content] = src?.match(/^data:\s*([^;,]+)?(;\s*base64)?,\s*(.*)$/) ?? [];
