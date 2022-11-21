@@ -1,11 +1,26 @@
-export function parseAttrs(x: string): Record<string, string> {
-    let attrs: Record<string, string> = {};
+import {toCamelCase} from './toCamelCase';
+
+export function parseAttrs(x: string): Record<string, unknown> {
+    let attrs: Record<string, unknown> = {};
     let attrStrings = x.trim().match(/([\w\-:]+)=["']([^"]+)["']/g) ?? [];
 
     for (const attrString of attrStrings) {
-        let matches = attrString.match(/([\w\-:]+)=["']([^"]+)["']/);
-        if (matches && matches.length > 2)
-            attrs[matches[1]] = matches[2]; 
+        let [, key, value] = attrString.match(/([\w\-:]+)=["']([^"]+)["']/) ?? [];
+
+        if (!key || value === undefined)
+            continue;
+
+        key = toCamelCase(key);
+
+        if (key === 'class')
+            key = 'className';
+
+        try {
+            attrs[key] = JSON.parse(value);
+        }
+        catch {
+            attrs[key] = value;
+        }
     }
 
     return attrs;
