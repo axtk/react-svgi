@@ -95,15 +95,17 @@ export const SVGImage = memo((props: SVGImageProps) => {
 
                     if (!styleNode) {
                         styleNode = document.createElement('style');
+                        if (nonce) styleNode.setAttribute('nonce', nonce);
 
                         if (element.firstChild)
                             element.insertBefore(styleNode, element.firstChild);
                         else element.appendChild(styleNode);
                     }
 
-                    if (nonce)
+                    if (nonce && styleNode.getAttribute('nonce') !== nonce)
                         styleNode.setAttribute('nonce', nonce);
-                    else if (styleNode.hasAttribute('nonce'))
+
+                    if (!nonce && styleNode.hasAttribute('nonce'))
                         styleNode.removeAttribute('nonce');
 
                     if (styleNode.innerHTML !== styleContent)
