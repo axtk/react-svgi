@@ -37,12 +37,7 @@ export const SVGImage = memo((props: SVGImageProps) => {
     let k2 = lowerCaseContent.lastIndexOf('</svg>');
     if (k2 === -1) k2 = content.length;
 
-    let innerContent = content.substring(k1 + 1, k2).trim()
-        // normalizing the whitespaces to even out the mismatch of the
-        // server-side and client-side rendering
-        .replace(/>\s+<([\w\-:]+[>\s\/])/g, '> <$1');
-
-    let styles: string[] = [];
+    let innerContent = content.substring(k1 + 1, k2).trim();
     let {style: selfStyle, ...contentProps} = parseAttrs(content.substring(k0 + 4, k1));
 
     if (alt !== undefined) {
@@ -54,29 +49,11 @@ export const SVGImage = memo((props: SVGImageProps) => {
         else innerContent = `<title>${alt}</title> ${innerContent}`;
     }
 
-    if (nonce !== undefined) {
-        let styleIndices: [number, number][] = [];
-        let s = innerContent.toLowerCase();
-        let i0 = 0, i1 = 0;
-
-        while ((i0 = s.search(/<style(\s|>|$)/)) !== -1) {
-            i0 += i1;
-            i1 = s.indexOf('</style>', i0);
-
-            if (i1 === -1) break;
-
-            let style = innerContent.substring(i0, i1)
-                .replace(/^<style(\s+[^>]+)?>/i, '')
-                .replace(/<\/style>$/, '');
-
-            styles.push(style);
-            styleIndices.push([i0, i1 + 8]);
-
-            s = s.substring(i1);
-        }
-
-        for (let [i0, i1] of styleIndices.reverse())
-            innerContent = innerContent.slice(0, i0) + innerContent.slice(i1);
+    if (nonce !== undefined && innerContent.toLowerCase().includes('</style>')) {
+        innerContent = innerContent.replace(
+            /<style(\s+[^>]+)?>/gi,
+            `<style nonce="${nonce}"$1>`,
+        );
     }
 
     return (
@@ -84,36 +61,17 @@ export const SVGImage = memo((props: SVGImageProps) => {
             xmlns={xmlns}
             {...contentProps}
             {...svgProps}
-            dangerouslySetInnerHTML={{__html: innerContent}}
             ref={element => {
                 if (!element || typeof window === 'undefined')
                     return;
 
-                if (styles.length !== 0) {
-                    let styleNode = element.querySelector('style');
-                    let styleContent = styles.join('\n');
-
-                    if (!styleNode) {
-                        styleNode = document.createElement('style');
-                        if (nonce) styleNode.setAttribute('nonce', nonce);
-
-                        if (element.firstChild)
-                            element.insertBefore(styleNode, element.firstChild);
-                        else element.appendChild(styleNode);
-                    }
-
-                    if (nonce && styleNode.getAttribute('nonce') !== nonce)
-                        styleNode.setAttribute('nonce', nonce);
-
-                    if (!nonce && styleNode.hasAttribute('nonce'))
-                        styleNode.removeAttribute('nonce');
-
-                    if (styleNode.innerHTML !== styleContent)
-                        styleNode.innerHTML = styleContent;
-                }
-
                 if (typeof selfStyle === 'string')
                     element.setAttribute('style', selfStyle);
+
+                // setting the content here instead of the `dangerouslySetInnerHTML` prop
+                // helps avoid the mismatch of the server-side and client-side rendering
+                if (element.innerHTML !== innerContent)
+                    element.innerHTML = innerContent;
             }}
         />
     );
