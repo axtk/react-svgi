@@ -90,13 +90,22 @@ export const SVGImage = memo((props: SVGImageProps) => {
                     return;
 
                 if (styles.length !== 0) {
-                    let styleNode = document.createElement('style');
-                    styleNode.innerHTML = styles.join('\n');
-                    if (nonce) styleNode.setAttribute('nonce', nonce);
+                    let styleNode = element.querySelector('style');
 
-                    if (element.firstChild)
-                        element.insertBefore(styleNode, element.firstChild);
-                    else element.appendChild(styleNode);
+                    if (!styleNode) {
+                        styleNode = document.createElement('style');
+
+                        if (element.firstChild)
+                            element.insertBefore(styleNode, element.firstChild);
+                        else element.appendChild(styleNode);
+                    }
+
+                    if (nonce)
+                        styleNode.setAttribute('nonce', nonce);
+                    else if (styleNode.hasAttribute('nonce'))
+                        styleNode.removeAttribute('nonce');
+
+                    styleNode.innerHTML = styles.join('\n');
                 }
 
                 if (typeof selfStyle === 'string')
