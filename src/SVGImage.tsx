@@ -40,15 +40,6 @@ export const SVGImage = memo((props: SVGImageProps) => {
     let innerContent = content.substring(k1 + 1, k2).trim();
     let {style: selfStyle, ...contentProps} = parseAttrs(content.substring(k0 + 4, k1));
 
-    if (alt !== undefined) {
-        if (innerContent.toLowerCase().includes('</title>'))
-            innerContent = innerContent.replace(
-                /<title(\s+[^>]+)?>([^<]+)?<\/title>/i,
-                `<title$1>${alt}</title>`,
-            );
-        else innerContent = `<title>${alt}</title> ${innerContent}`;
-    }
-
     if (nonce !== undefined && innerContent.toLowerCase().includes('</style>')) {
         innerContent = innerContent.replace(
             /<style(\s+[^>]+)?>/gi,
@@ -72,7 +63,25 @@ export const SVGImage = memo((props: SVGImageProps) => {
                 // helps avoid the mismatch of the server-side and client-side rendering
                 if (element.innerHTML !== innerContent)
                     element.innerHTML = innerContent;
+
+                let titleNode = element.querySelector('title') as SVGTitleElement | null;
+
+                if (!titleNode && alt !== undefined) {
+                    titleNode = document.createElementNS(xmlns, 'title');
+
+                    if (element.firstChild)
+                        element.insertBefore(titleNode, element.firstChild);
+                    else element.appendChild(titleNode);
+                }
+
+                if (titleNode && alt !== undefined && titleNode.textContent !== alt)
+                    titleNode.textContent = alt;
+
+                if (titleNode && alt === undefined)
+                    titleNode.remove();
             }}
-        />
+        >
+            {alt && <title>{alt}</title>}
+        </svg>
     );
 });
