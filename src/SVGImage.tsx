@@ -91,6 +91,7 @@ export const SVGImage = memo((props: SVGImageProps) => {
 
                 if (styles.length !== 0) {
                     let styleNode = element.querySelector('style');
+                    let styleContent = styles.join('\n');
 
                     if (!styleNode) {
                         styleNode = document.createElement('style');
@@ -105,7 +106,8 @@ export const SVGImage = memo((props: SVGImageProps) => {
                     else if (styleNode.hasAttribute('nonce'))
                         styleNode.removeAttribute('nonce');
 
-                    styleNode.innerHTML = styles.join('\n');
+                    if (styleNode.innerHTML !== styleContent)
+                        styleNode.innerHTML = styleContent;
                 }
 
                 if (typeof selfStyle === 'string')
