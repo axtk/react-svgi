@@ -91,6 +91,7 @@ export const SVGImage = memo((props: SVGImageProps) => {
 
                 if (styles.length !== 0) {
                     let styleNode = document.createElement('style');
+                    styleNode.innerHTML = styles.join('\n');
                     if (nonce) styleNode.setAttribute('nonce', nonce);
 
                     if (element.firstChild)
