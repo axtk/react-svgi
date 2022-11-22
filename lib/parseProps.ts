@@ -1,6 +1,6 @@
 import {toCamelCase} from './toCamelCase';
 
-export function parseAttrs(x: string): Record<string, unknown> {
+export function parseProps(x: string): Record<string, unknown> {
     let attrs: Record<string, unknown> = {};
     let attrStrings = x.trim().match(/([\w\-:]+)=["']([^"]+)["']/g) ?? [];
 
