@@ -1,4 +1,4 @@
-import {memo, useRef} from 'react';
+import {memo} from 'react';
 import type {SVGAttributes} from 'react';
 import {decodeBase64} from '../lib/decodeBase64';
 import {parseAttrs} from '../lib/parseAttrs';
@@ -19,8 +19,6 @@ export const SVGErrorImage = ({src, alt, onDataError, ...props}: SVGImageProps) 
 );
 
 export const SVGImage = memo((props: SVGImageProps) => {
-    let svgImageId = useRef(props.id ?? `svg-${Math.random().toString(36).slice(2)}`);
-
     let {src, alt, nonce, onDataError, ...svgProps} = props;
     let [, type, base64, content] = src?.match(/^data:\s*([^;,]+)?(;\s*base64)?,\s*(.*)$/) ?? [];
 
@@ -45,12 +43,7 @@ export const SVGImage = memo((props: SVGImageProps) => {
         .replace(/>\s+<([\w\-:]+[>\s\/])/g, '> <$1');
 
     let styles: string[] = [];
-    let contentProps = parseAttrs(content.substring(k0 + 4, k1)) as SVGAttributes<SVGElement>;
-
-    if (contentProps.style !== undefined) {
-        styles.push(`#${svgImageId.current} {${contentProps.style}}`);
-        delete contentProps.style;
-    }
+    let {style: selfStyle, ...contentProps} = parseAttrs(content.substring(k0 + 4, k1));
 
     if (alt !== undefined) {
         if (innerContent.toLowerCase().includes('</title>'))
@@ -93,30 +86,20 @@ export const SVGImage = memo((props: SVGImageProps) => {
             {...svgProps}
             dangerouslySetInnerHTML={{__html: innerContent}}
             ref={element => {
-                if (!element || typeof window === 'undefined' || styles.length === 0 || !nonce)
+                if (!element || typeof window === 'undefined')
                     return;
 
-                let styleNode = document.querySelector('style.react-svgi');
+                if (styles.length !== 0) {
+                    let styleNode = document.createElement('style');
+                    if (nonce) styleNode.setAttribute('nonce', nonce);
 
-                if (!styleNode) {
-                    styleNode = document.createElement('style');
-                    styleNode.setAttribute('nonce', nonce);
-                    styleNode.className = 'react-svgi';
-
-                    document.head.appendChild(styleNode);
+                    if (element.firstChild)
+                        element.insertBefore(styleNode, element.firstChild);
+                    else element.appendChild(styleNode);
                 }
 
-                styleNode.innerHTML += ('\n' + styles.join('\n'))
-                    .replace(
-                        /(^|\})\s*([^\{\}]+)(\{)/g,
-                        `$1 #${svgImageId.current} $2$3`,
-                    )
-                    .replace(
-                        new RegExp(`#${svgImageId.current}\\s+#${svgImageId.current}`, 'g'),
-                        `#${svgImageId.current}`,
-                    );
-
-                element.id = svgImageId.current;
+                if (typeof selfStyle === 'string')
+                    element.setAttribute('style', selfStyle);
             }}
         />
     );
