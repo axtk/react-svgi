@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {memo, useRef} from 'react';
 import type {SVGAttributes} from 'react';
 import toStyleAttribute from 'react-style-object-to-css';
 import {decodeBase64} from '../lib/decodeBase64';
@@ -22,6 +22,8 @@ export const SVGErrorImage = ({src, alt, onDataError, ...props}: SVGImageProps) 
 );
 
 export const SVGImage = memo((props: SVGImageProps) => {
+    let svgId = useRef(`svg-${Math.random().toString(36).slice(2)}`);
+
     let {src, alt, style, nonce, onDataError, ...componentProps} = props;
     let [, type, base64, content] = src?.match(/^data:\s*([^;,]+)?(;\s*base64)?,\s*(.*)$/) ?? [];
 
@@ -64,6 +66,9 @@ export const SVGImage = memo((props: SVGImageProps) => {
                 if (element.innerHTML !== innerContent)
                     element.innerHTML = innerContent;
 
+                if (!componentProps.id)
+                    element.id = svgId.current;
+
                 // (1) the style attribute is set in the client-side rendering phase to
                 // avoid a likely mismatch against the server-side rendering output (which
                 // could skip rendering styles altogether);
@@ -73,10 +78,14 @@ export const SVGImage = memo((props: SVGImageProps) => {
                 // support all the CSS features available to an outer <svg> (like setting
                 // a background color); setting the merged style to the outer <svg>
                 // should solve this
-                toggleStyle(element, mergeStyleAttributes(
+                let mergedStyle = mergeStyleAttributes(
                     contentStyle as string | undefined,
                     toStyleAttribute(style),
-                ));
+                );
+                toggleStyle(element, mergedStyle, {
+                    nonce,
+                    id: componentProps.id || svgId.current,
+                });
 
                 toggleTitle(element, alt);
             }}

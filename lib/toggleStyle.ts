@@ -1,9 +1,54 @@
-import {xmlns} from './xmlns';
+export type ToggleStyleOptions = {
+    nonce?: string;
+    id?: string;
+};
 
-export function toggleStyle(svgElement: SVGSVGElement, style: string | undefined) {
-    if (style && svgElement.getAttributeNS(xmlns, 'style') !== style)
-        svgElement.setAttributeNS(xmlns, 'style', style);
+export function toggleStyle(
+    svgElement: SVGSVGElement,
+    style: string | undefined,
+    {nonce, id}: ToggleStyleOptions = {},
+) {
+    if (nonce && id) {
+        let styleElement = document.querySelector('style.react-svgi');
 
-    if (!style && svgElement.hasAttributeNS(xmlns, 'style'))
-        svgElement.removeAttributeNS(xmlns, 'style');
+        if (!styleElement) {
+            if (!style) return;
+
+            styleElement = document.createElement('style');
+            styleElement.className = 'react-svgi';
+            styleElement.setAttribute('nonce', nonce);
+            document.head.appendChild(styleElement);
+        }
+
+        let styleContent = styleElement.textContent ?? '';
+        let nextStyleContent = '';
+
+        for (let line of styleContent.split('\n')) {
+            if (!line.startsWith(`#${id} `)) {
+                nextStyleContent += `\n${line}`;
+                continue;
+            }
+
+            if (!style)
+                continue;
+
+            nextStyleContent += `\n#${id} {${style}}`;
+        }
+
+        if (!nextStyleContent) {
+            styleElement.remove();
+            return;
+        }
+
+        if (nextStyleContent !== styleContent)
+            styleElement.textContent = nextStyleContent;
+
+        return;
+    }
+
+    if (style && svgElement.getAttribute('style') !== style)
+    svgElement.setAttribute('style', style);
+
+    if (!style && svgElement.hasAttribute('style'))
+        svgElement.removeAttribute('style');
 }
