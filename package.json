@@ -12,6 +12,11 @@
     "preversion": "npm run build",
     "typecheck": "tsc --noEmit"
   },
+  "keywords": [
+    "react",
+    "svg",
+    "data-url"
+  ],
   "author": "axtk",
   "license": "ISC",
   "peerDependencies": {
