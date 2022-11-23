@@ -9,13 +9,13 @@ export function toggleStyle(
     {nonce, id}: ToggleStyleOptions = {},
 ) {
     if (nonce && id) {
-        let styleElement = document.querySelector('style.react-svgi');
+        let styleElement = document.querySelector('style.svg');
 
         if (!styleElement) {
             if (!style) return;
 
             styleElement = document.createElement('style');
-            styleElement.className = 'react-svgi';
+            styleElement.className = 'svg';
             styleElement.setAttribute('nonce', nonce);
             document.head.appendChild(styleElement);
         }
