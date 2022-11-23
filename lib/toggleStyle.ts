@@ -21,19 +21,21 @@ export function toggleStyle(
         }
 
         let styleContent = styleElement.textContent ?? '';
-        let nextStyleContent = '';
+        let nextStyleContent = '', hasStyle = false;
 
         for (let line of styleContent.split('\n')) {
-            if (!line.startsWith(`#${id} `)) {
-                nextStyleContent += `\n${line}`;
-                continue;
+            if (line.startsWith(`#${id} `)) {
+                hasStyle = true;
+
+                if (style)
+                    nextStyleContent += `\n#${id} {${style}}`;
             }
-
-            if (!style)
-                continue;
-
-            nextStyleContent += `\n#${id} {${style}}`;
+            else if (line.trim())
+                nextStyleContent += `\n${line}`;
         }
+
+        if (!hasStyle && style)
+            nextStyleContent += `\n#${id} {${style}}`;
 
         if (!nextStyleContent) {
             styleElement.remove();
