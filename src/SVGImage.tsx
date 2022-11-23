@@ -40,7 +40,7 @@ export const SVGImage = memo((props: SVGImageProps) => {
     let k2 = lowerCaseContent.lastIndexOf('</svg>');
     if (k2 === -1) k2 = content.length;
 
-    let innerContent = `<svg>${content.substring(k1 + 1, k2).trim()}</svg>`;
+    let innerContent = content.substring(k1 + 1, k2).trim();
     let {style: contentStyle, ...contentProps} = parseProps(content.substring(k0 + 4, k1));
 
     if (nonce !== undefined && innerContent.toLowerCase().includes('</style>')) {
