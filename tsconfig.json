@@ -1,6 +1,7 @@
 {
-    "include": ["index.ts"],
+    "include": ["@types/*", "index.ts"],
     "compilerOptions": {
+        "typeRoots": ["@types", "node_modules/@types"],
         "lib": ["esnext", "dom"],
         "target": "esnext",
         "outDir": "dist",

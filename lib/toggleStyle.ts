@@ -1,9 +1,6 @@
 import {xmlns} from './xmlns';
 
-export function toggleStyle(svgElement: SVGSVGElement | null, style: string | undefined) {
-    if (!svgElement)
-        return;
-
+export function toggleStyle(svgElement: SVGSVGElement, style: string | undefined) {
     if (style && svgElement.getAttributeNS(xmlns, 'style') !== style)
         svgElement.setAttributeNS(xmlns, 'style', style);
 
