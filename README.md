@@ -2,6 +2,11 @@
 
 *React SVGImage component*
 
+- converts an SVG image encoded as a [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs) (`'data:image/svg+xml,...'`) into a React `<svg>` component;
+- accepts all SVG attributes;
+- accepts an optional `nonce` value for nested styles (via the `nonce` prop);
+- can set a `<title>` to make the component more accessible (via the `alt` prop).
+
 Code:
 
 ```tsx
