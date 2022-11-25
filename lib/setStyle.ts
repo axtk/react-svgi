@@ -9,14 +9,14 @@ export function setStyle(
 ) {
     if (nonce && svgId) {
         let svgElement = document.querySelector(`[data-svg-id="${svgId}"]`);
-        let styleElement = svgElement?.querySelector('style.inline-styles');
+        let styleElement = svgElement?.querySelector(`style[data-style-id="${svgId}"]`);
 
         if (!styleElement) {
             if (!svgElement || Object.keys(styleMap).length === 0)
                 return;
 
             styleElement = document.createElement('style');
-            styleElement.className = 'inline-styles';
+            styleElement.setAttribute('data-style-id', svgId);
             styleElement.setAttribute('nonce', nonce);
 
             svgElement.appendChild(styleElement);
