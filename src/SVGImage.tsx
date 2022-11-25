@@ -50,7 +50,7 @@ export const SVGImage = memo((props: SVGImageProps) => {
 
                 styleMap[id] = style;
 
-                return ` data-svg-id=${id}$3`;
+                return ` data-svg-id=${id}${matches[3]}`;
             },
         )
     }
