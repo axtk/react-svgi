@@ -1,18 +1,18 @@
-export type ToggleStyleOptions = {
-    nonce?: string;
-    id?: string;
-};
+import {toggleStyleAttribute} from './toggleStyleAttribute';
+
+const removeSvgId = (element: Element | null) => element?.removeAttribute('data-svg-id');
 
 export function setStyle(
-    svgElement: SVGSVGElement,
-    style: string | undefined,
-    {nonce, id}: ToggleStyleOptions = {},
+    styleMap: Record<string, string>,
+    svgId: string,
+    nonce?: string | undefined,
 ) {
-    if (nonce && id) {
+    if (nonce && svgId) {
         let styleElement = document.querySelector('style.svg');
 
         if (!styleElement) {
-            if (!style) return;
+            if (Object.keys(styleMap).length === 0)
+                return;
 
             styleElement = document.createElement('style');
             styleElement.className = 'svg';
@@ -21,21 +21,25 @@ export function setStyle(
         }
 
         let styleContent = styleElement.textContent ?? '';
-        let nextStyleContent = '', hasStyle = false;
+        let nextStyleContent = '', hasStyles = false;
 
         for (let line of styleContent.split('\n')) {
-            if (line.startsWith(`#${id} `)) {
-                hasStyle = true;
+            if (line.startsWith(`[data-svg-id="${svgId}"]`) || line.startsWith(`[data-svg-id="${svgId}-`)) {
+                if (hasStyles) continue;
 
-                if (style)
-                    nextStyleContent += `\n#${id} {${style}}`;
+                for (let [id, style] of Object.entries(styleMap))
+                    nextStyleContent += `\n[data-svg-id="${id}"] {${style}}`;
+
+                hasStyles = true;
             }
             else if (line.trim())
                 nextStyleContent += `\n${line}`;
         }
 
-        if (!hasStyle && style)
-            nextStyleContent += `\n#${id} {${style}}`;
+        if (!hasStyles) {
+            for (let [id, style] of Object.entries(styleMap))
+                nextStyleContent += `\n[data-svg-id="${id}"] {${style}}`;
+        }
 
         if (!nextStyleContent) {
             styleElement.remove();
@@ -48,9 +52,19 @@ export function setStyle(
         return;
     }
 
-    if (style && svgElement.getAttribute('style') !== style)
-    svgElement.setAttribute('style', style);
+    let relatedElements = document.querySelectorAll(`[data-svg-id^="${svgId}-"]`);
 
-    if (!style && svgElement.hasAttribute('style'))
-        svgElement.removeAttribute('style');
+    for (let element of Array.from(relatedElements ?? []))
+        toggleStyleAttribute(
+            element,
+            styleMap[element.getAttribute('data-svg-id') ?? ''],
+            removeSvgId,
+        );
+
+    for (let [id, style] of Object.entries(styleMap))
+        toggleStyleAttribute(
+            document.querySelector(`[data-svg-id="${id}"]`),
+            style,
+            removeSvgId,
+        );
 }
