@@ -1,6 +1,6 @@
 import {xmlns} from './xmlns';
 
-export function toggleTitle(svgElement: SVGSVGElement, title: string | undefined) {
+export function setTitle(svgElement: SVGSVGElement, title: string | undefined) {
     let titleElement = svgElement.querySelector('title') as SVGTitleElement | null;
 
     if (!titleElement && title !== undefined) {

@@ -3,7 +3,7 @@ export type ToggleStyleOptions = {
     id?: string;
 };
 
-export function toggleStyle(
+export function setStyle(
     svgElement: SVGSVGElement,
     style: string | undefined,
     {nonce, id}: ToggleStyleOptions = {},

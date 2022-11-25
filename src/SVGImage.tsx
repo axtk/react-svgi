@@ -3,8 +3,8 @@ import toStyleAttribute from 'react-style-object-to-css';
 import {decodeBase64} from '../lib/decodeBase64';
 import {parseProps} from '../lib/parseProps';
 import {mergeStyleAttributes} from '../lib/mergeStyleAttributes';
-import {toggleTitle} from '../lib/toggleTitle';
-import {toggleStyle} from '../lib/toggleStyle';
+import {setTitle} from '../lib/setTitle';
+import {setStyle} from '../lib/setStyle';
 import {xmlns} from '../lib/xmlns';
 import type {SVGImageProps} from './types';
 import {SVGErrorImage} from './SVGErrorImage';
@@ -70,12 +70,12 @@ export const SVGImage = memo((props: SVGImageProps) => {
                     contentStyle as string | undefined,
                     toStyleAttribute(style),
                 );
-                toggleStyle(element, mergedStyle, {
+                setStyle(element, mergedStyle, {
                     nonce,
                     id: componentProps.id || svgId.current,
                 });
 
-                toggleTitle(element, alt);
+                setTitle(element, alt);
             }}
         >
             {alt && <title>{alt}</title>}
