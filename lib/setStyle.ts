@@ -8,16 +8,18 @@ export function setStyle(
     nonce?: string | undefined,
 ) {
     if (nonce && svgId) {
-        let styleElement = document.querySelector('style.svg');
+        let svgElement = document.querySelector(`[data-svg-id="${svgId}"]`);
+        let styleElement = svgElement?.querySelector('style.inline-styles');
 
         if (!styleElement) {
-            if (Object.keys(styleMap).length === 0)
+            if (!svgElement || Object.keys(styleMap).length === 0)
                 return;
 
             styleElement = document.createElement('style');
-            styleElement.className = 'svg';
+            styleElement.className = 'inline-styles';
             styleElement.setAttribute('nonce', nonce);
-            document.head.appendChild(styleElement);
+
+            svgElement.appendChild(styleElement);
         }
 
         let styleContent = styleElement.textContent ?? '';
