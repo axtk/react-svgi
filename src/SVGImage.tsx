@@ -1,5 +1,4 @@
 import {memo, useRef} from 'react';
-import type {SVGAttributes} from 'react';
 import toStyleAttribute from 'react-style-object-to-css';
 import {decodeBase64} from '../lib/decodeBase64';
 import {parseProps} from '../lib/parseProps';
@@ -7,19 +6,8 @@ import {mergeStyleAttributes} from '../lib/mergeStyleAttributes';
 import {toggleTitle} from '../lib/toggleTitle';
 import {toggleStyle} from '../lib/toggleStyle';
 import {xmlns} from '../lib/xmlns';
-
-export type SVGImageProps = SVGAttributes<SVGElement> & {
-    src?: string;
-    alt?: string;
-    nonce?: string;
-    onDataError?: () => void;
-};
-
-export const SVGErrorImage = ({src, alt, onDataError, ...props}: SVGImageProps) => (
-    <svg xmlns={xmlns} {...props} ref={element => element && onDataError?.()}>
-        <title>{alt}</title>
-    </svg>
-);
+import type {SVGImageProps} from './types';
+import {SVGErrorImage} from './SVGErrorImage';
 
 export const SVGImage = memo((props: SVGImageProps) => {
     let svgId = useRef(`svg-${Math.random().toString(36).slice(2)}`);
