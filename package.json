@@ -27,8 +27,5 @@
   "devDependencies": {
     "cross-env": "7.0.3",
     "typescript": "4.9.3"
-  },
-  "dependencies": {
-    "react-style-object-to-css": "1.1.2"
   }
 }
